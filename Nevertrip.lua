@@ -339,6 +339,16 @@ UITextSizeConstraint_7.Parent = OpenMenu
 UITextSizeConstraint_7.MaxTextSize = 22
 
 -- Scripts:
+-- Добавьте эти строки после создания Esp и BaseStatus
+local BoolValue = Instance.new("BoolValue")
+BoolValue.Name = "Checked"
+BoolValue.Value = false
+BoolValue.Parent = Esp
+
+local BoolValue2 = Instance.new("BoolValue")
+BoolValue2.Name = "Checked"
+BoolValue2.Value = false
+BoolValue2.Parent = BaseStatus
 
 local function DVSAHXG_fake_script() -- Esp.LocalScript 
 	local script = Instance.new('LocalScript', Esp)
