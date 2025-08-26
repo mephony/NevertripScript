@@ -1,555 +1,823 @@
--- Gui to Lua
--- Version: 3.2
+local Library = loadstring(game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
+local SaveManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/SaveManager.luau"))()
+local InterfaceManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/InterfaceManager.luau"))()
 
--- Instances:
+local TIME_SELECTED = {
+	["30 Sec"] = 30,
+	["1 Min"] = 60,      -- 1 минута = 60 секунд
+	["2 Min"] = 120,     -- 2 минуты = 120 секунд
+	["3 Min"] = 180,     -- 3 минуты = 180 секунд
+	["5 Min"] = 300,     -- 5 минут = 300 секунд
+	["10 Min"] = 600,    -- 10 минут = 600 секунд
+	["15 Min"] = 900     -- 15 минут = 900 секунд
+}
 
-local ScreenGui = Instance.new("ScreenGui")
-local Gui = Instance.new("Frame")
-local TabsFrame = Instance.new("Frame")
-local Tabs = Instance.new("Folder")
-local Main = Instance.new("TextButton")
-local Text = Instance.new("TextLabel")
-local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
-local ImageLabel = Instance.new("ImageLabel")
-local UITextSizeConstraint_2 = Instance.new("UITextSizeConstraint")
-local UICorner = Instance.new("UICorner")
-local Visuals = Instance.new("TextButton")
-local Text_2 = Instance.new("TextLabel")
-local UITextSizeConstraint_3 = Instance.new("UITextSizeConstraint")
-local ImageLabel_2 = Instance.new("ImageLabel")
-local UITextSizeConstraint_4 = Instance.new("UITextSizeConstraint")
-local UICorner_2 = Instance.new("UICorner")
-local UIListLayout = Instance.new("UIListLayout")
-local UICorner_3 = Instance.new("UICorner")
-local ChildFrame = Instance.new("Frame")
-local Visuals_2 = Instance.new("Frame")
-local Slider = Instance.new("Folder")
-local Buttons = Instance.new("Folder")
-local Esp = Instance.new("ImageButton")
-local TextLabel = Instance.new("TextLabel")
-local UITextSizeConstraint_5 = Instance.new("UITextSizeConstraint")
-local BaseStatus = Instance.new("ImageButton")
-local TextLabel_2 = Instance.new("TextLabel")
-local UITextSizeConstraint_6 = Instance.new("UITextSizeConstraint")
-local Main_2 = Instance.new("Frame")
-local Slider_2 = Instance.new("Folder")
-local Buttons_2 = Instance.new("Folder")
-local UICorner_4 = Instance.new("UICorner")
-local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
-local Watermark = Instance.new("Frame")
-local Line = Instance.new("Frame")
-local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
-local OpenMenu = Instance.new("TextButton")
-local UITextSizeConstraint_7 = Instance.new("UITextSizeConstraint")
+local isEnabled = false
 
---Properties:
+local Window = Library:CreateWindow{
+	Title = `Celestum X`,
+	SubTitle = "RECODE",
+	TabWidth = 160,
+	Size = UDim2.fromScale(0.45, 0.7),
+	Resize = true, -- Resize this ^ Size according to a 1920x1080 screen, good for mobile users but may look weird on some devices
+	MinSize = Vector2.new(470, 380),
+	Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
+	Theme = "Tomorrow Night Blue",
+	MinimizeKey = Enum.KeyCode.RightControl -- Used when theres no MinimizeKeybind
+}
 
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local SELECTED_TIME = 30
 
-Gui.Name = "Gui"
-Gui.Parent = ScreenGui
-Gui.Active = true
-Gui.AnchorPoint = Vector2.new(0.5, 0.5)
-Gui.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Gui.BackgroundTransparency = 0.050
-Gui.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Gui.BorderSizePixel = 0
-Gui.Position = UDim2.new(0.5, 0, 0.5, 0)
-Gui.Selectable = true
-Gui.Size = UDim2.new(0.475695759, 0, 0.600990593, 0)
+-- Fluent Renewed provides ALL 1544 Lucide 0.469.0 https://lucide.dev/icons/ Icons and ALL 9072 Phosphor 2.1.0 https://phosphoricons.com/ Icons for the tabs, icons are optional
+local Tabs = {
+	Main = Window:CreateTab{
+		Title = "Main",
+		Icon = "phosphor-users-bold"
+	},
+	Visuals = Window:CreateTab{
+		Title = "Visuals",
+		Icon = "cloud"
+	},
+	Player = Window:CreateTab{
+		Title = "Player",
+		Icon = "user"
+	},
+	Settings = Window:CreateTab{
+		Title = "Settings",
+		Icon = "settings"
+	}
+}
 
-TabsFrame.Name = "TabsFrame"
-TabsFrame.Parent = Gui
-TabsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-TabsFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-TabsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-TabsFrame.BorderSizePixel = 0
-TabsFrame.Position = UDim2.new(0.106471039, 0, 0.495214134, 0)
-TabsFrame.Size = UDim2.new(0.199143454, 0, 0.962007165, 0)
+local Options = Library.Options
 
-Tabs.Name = "Tabs"
-Tabs.Parent = TabsFrame
+Library:Notify{
+	Title = "Welcome in Celestum X",
+	Content = "More functions.",
+	SubContent = "Good luck", -- Optional
+	Duration = 5 -- Set to nil to make the notification not disappear
+}
 
-Main.Name = "Main"
-Main.Parent = Tabs
-Main.AnchorPoint = Vector2.new(0.5, 0.5)
-Main.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Main.BorderSizePixel = 0
-Main.Position = UDim2.new(0, 1, 0, 1)
-Main.Size = UDim2.new(0.951779664, 0, 0.0613236502, 0)
-Main.Font = Enum.Font.SourceSans
-Main.TextColor3 = Color3.fromRGB(554, 554, 554)
-Main.TextScaled = true
-Main.TextSize = 14.000
-Main.TextTransparency = 1.000
-Main.TextWrapped = true
+local AutoCollectMoney = Tabs.Main:AddSection("Auto Collect Money")
 
-Text.Name = "Text"
-Text.Parent = Main
-Text.AnchorPoint = Vector2.new(0.5, 0.5)
-Text.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Text.BackgroundTransparency = 1.000
-Text.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Text.BorderSizePixel = 0
-Text.Position = UDim2.new(0.613985956, 0, 0.545632303, 0)
-Text.Size = UDim2.new(0.77185303, 0, 0.99999994, 0)
-Text.Font = Enum.Font.Nunito
-Text.Text = "Main"
-Text.TextColor3 = Color3.fromRGB(554, 554, 554)
-Text.TextScaled = true
-Text.TextSize = 14.000
-Text.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-Text.TextWrapped = true
-Text.TextXAlignment = Enum.TextXAlignment.Left
+-- Таблица соответствия времени в секундах
+local TIME_SELECTED = {
+	["30 Sec"] = 30,
+	["1 Min"] = 60,
+	["2 Min"] = 120,
+	["3 Min"] = 180,
+	["5 Min"] = 300,
+	["10 Min"] = 600,
+	["15 Min"] = 900
+}
 
-UITextSizeConstraint.Parent = Text
-UITextSizeConstraint.MaxTextSize = 23
+-- Переменная для хранения выбранного времени
+local SELECTED_TIME = 60 -- По умолчанию 1 минута
 
-ImageLabel.Parent = Main
-ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ImageLabel.BackgroundTransparency = 1.000
-ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ImageLabel.BorderSizePixel = 0
-ImageLabel.Position = UDim2.new(0.111040018, 0, 0.545632303, 0)
-ImageLabel.Size = UDim2.new(0.228903279, 0, 0.766666532, 0)
-ImageLabel.Image = "rbxassetid://4335479121"
-ImageLabel.ScaleType = Enum.ScaleType.Fit
 
-UITextSizeConstraint_2.Parent = Main
-UITextSizeConstraint_2.MaxTextSize = 14
+-- Теперь создаем toggle
+local AutoCollect = Tabs.Main:CreateToggle("AutoCollectToggle", {
+	Title = "Auto Collect Money", 
+	Default = false 
+})
+-- Создаем dropdown ПЕРВЫМ, чтобы TIME_SELECTED был определен
+local Dropdown = Tabs.Main:CreateDropdown("Dropdown", {
+	Title = "He will collect the money every:",
+	Values = {"30 Sec", "1 Min", "2 Min", "3 Min", "5 Min", "10 Min", "15 Min"},
+	Multi = false,
+	Default = 1,
+})
 
-UICorner.Parent = Main
+-- Обработчик изменения dropdown
+Dropdown:OnChanged(function(Value)
+	SELECTED_TIME = TIME_SELECTED[Value] or 60
+	print("Время сбора установлено: " .. Value .. " (" .. SELECTED_TIME .. " секунд)")
+end)
 
-Visuals.Name = "Visuals"
-Visuals.Parent = Tabs
-Visuals.AnchorPoint = Vector2.new(0.5, 0.5)
-Visuals.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Visuals.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Visuals.BorderSizePixel = 0
-Visuals.Position = UDim2.new(0, 1, 0, 1)
-Visuals.Size = UDim2.new(0.951779664, 0, 0.0593670122, 0)
-Visuals.Font = Enum.Font.SourceSans
-Visuals.TextColor3 = Color3.fromRGB(554, 554, 554)
-Visuals.TextScaled = true
-Visuals.TextSize = 14.000
-Visuals.TextTransparency = 1.000
-Visuals.TextWrapped = true
+AutoCollect:OnChanged(function(Value)
+	if Value then
+		task.spawn(function()
+			local Plots = game.Workspace:WaitForChild("Plots")
+			local Plr = game.Players.LocalPlayer
 
-Text_2.Name = "Text"
-Text_2.Parent = Visuals
-Text_2.AnchorPoint = Vector2.new(0.5, 0.5)
-Text_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Text_2.BackgroundTransparency = 1.000
-Text_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Text_2.BorderSizePixel = 0
-Text_2.Position = UDim2.new(0.607454181, 0, 0.476905376, 0)
-Text_2.Size = UDim2.new(0.77185303, 0, 0.99999994, 0)
-Text_2.Font = Enum.Font.Nunito
-Text_2.Text = "Visuals"
-Text_2.TextColor3 = Color3.fromRGB(554, 554, 554)
-Text_2.TextScaled = true
-Text_2.TextSize = 14.000
-Text_2.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-Text_2.TextWrapped = true
-Text_2.TextXAlignment = Enum.TextXAlignment.Left
+			while AutoCollect.Value do
+				local Chr = Plr.Character
+				if not Chr then
+					Chr = Plr.CharacterAdded:Wait()
+				end
 
-UITextSizeConstraint_3.Parent = Text_2
-UITextSizeConstraint_3.MaxTextSize = 30
+				local Humanoid = Chr:WaitForChild("Humanoid")
+				local RootPart = Chr:WaitForChild("HumanoidRootPart")
 
-ImageLabel_2.Parent = Visuals
-ImageLabel_2.AnchorPoint = Vector2.new(0.5, 0.5)
-ImageLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ImageLabel_2.BackgroundTransparency = 1.000
-ImageLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ImageLabel_2.BorderSizePixel = 0
-ImageLabel_2.Position = UDim2.new(0.104508251, 0, 0.476905376, 0)
-ImageLabel_2.Size = UDim2.new(0.216115892, 0, 0.766666532, 0)
-ImageLabel_2.Image = "rbxassetid://3610254229"
-ImageLabel_2.ScaleType = Enum.ScaleType.Fit
+				local function Collect()
+					local pointsVisited = 0
 
-UITextSizeConstraint_4.Parent = Visuals
-UITextSizeConstraint_4.MaxTextSize = 23
+					for _, Plot in Plots:GetChildren() do
+						if not AutoCollect.Value then break end
 
-UICorner_2.Parent = Visuals
+						local text = Plot:FindFirstChild("PlotSign")
+						if text then
+							local yourBase = text:FindFirstChild("YourBase")
+							if yourBase and yourBase.Enabled == true then
+								local AnimalPodiums = Plot:FindFirstChild("AnimalPodiums")
+								if AnimalPodiums then
 
-UIListLayout.Parent = Tabs
-UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0.00999999978, 0)
+									local points = {
+										AnimalPodiums:FindFirstChild("1"),
+										AnimalPodiums:FindFirstChild("5"), 
+										AnimalPodiums:FindFirstChild("6"),
+										AnimalPodiums:FindFirstChild("10")
+									}
 
-UICorner_3.Parent = TabsFrame
+									for _, point in ipairs(points) do
+										if not AutoCollect.Value then break end
+										if not point then continue end
 
-ChildFrame.Name = "ChildFrame"
-ChildFrame.Parent = Gui
-ChildFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-ChildFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ChildFrame.BackgroundTransparency = 1.000
-ChildFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ChildFrame.BorderSizePixel = 0
-ChildFrame.Position = UDim2.new(0.607875347, 0, 0.495214134, 0)
-ChildFrame.Size = UDim2.new(0.755910873, 0, 0.981381238, 0)
+										local claim = point:FindFirstChild("Claim")
+										if claim then
+											local hitbox = claim:FindFirstChild("Hitbox")
+											if hitbox then
+												local targetPos = hitbox:GetPivot().Position
+												local currentY = RootPart.Position.Y
+												local flatTargetPos = Vector3.new(targetPos.X, currentY, targetPos.Z)
 
-Visuals_2.Name = "Visuals"
-Visuals_2.Parent = ChildFrame
-Visuals_2.AnchorPoint = Vector2.new(0.5, 0.5)
-Visuals_2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Visuals_2.BackgroundTransparency = 1.000
-Visuals_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Visuals_2.BorderSizePixel = 0
-Visuals_2.ClipsDescendants = true
-Visuals_2.Position = UDim2.new(0.499530822, 0, 0.504609346, 0)
-Visuals_2.Size = UDim2.new(0.999999881, 0, 0.999999821, 0)
+												Humanoid:MoveTo(flatTargetPos)
+												pointsVisited += 1
 
-Slider.Name = "Slider"
-Slider.Parent = Visuals_2
+												-- Ждем достижения точки или таймаут
+												local reached = Humanoid.MoveToFinished:Wait(5)
+												if not reached then
+													wait(1)
+												else
+													wait(0.5)
+												end
 
-Buttons.Name = "Buttons"
-Buttons.Parent = Visuals_2
+												-- Если прошли все 4 точки, возвращаем true
+												if pointsVisited >= 4 then
+													return true
+												end
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+					return false
+				end
 
-Esp.Name = "Esp"
-Esp.Parent = Buttons
-Esp.AnchorPoint = Vector2.new(0.5, 0.5)
-Esp.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Esp.BackgroundTransparency = 1.000
-Esp.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Esp.BorderSizePixel = 0
-Esp.Position = UDim2.new(0.0179999731, 0, 0.0327996127, 0)
-Esp.Size = UDim2.new(0.0425829589, 0, 0.0655992255, 0)
-Esp.Image = "http://www.roblox.com/asset/?id=11772672161"
-Esp.ScaleType = Enum.ScaleType.Fit
+				local completedAllPoints = Collect()
 
-TextLabel.Parent = Esp
-TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel.BackgroundTransparency = 1.000
-TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel.BorderSizePixel = 0
-TextLabel.Position = UDim2.new(2.63295674, 0, 0.499999851, 0)
-TextLabel.Size = UDim2.new(3.25219774, 0, 0.691913188, 0)
-TextLabel.Font = Enum.Font.Unknown
-TextLabel.Text = "Esp"
-TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel.TextScaled = true
-TextLabel.TextSize = 14.000
-TextLabel.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel.TextWrapped = true
-TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+				if completedAllPoints then
+					print("Все 4 точки пройдены. Ожидание " .. SELECTED_TIME .. " секунд...")
+					wait(SELECTED_TIME)
+				else
+					wait(2)
+				end
+			end
+		end)
+	else
+		print("Auto Collect выключен")
+	end
+end) 
 
-UITextSizeConstraint_5.Parent = TextLabel
-UITextSizeConstraint_5.MaxTextSize = 18
 
-BaseStatus.Name = "BaseStatus"
-BaseStatus.Parent = Buttons
-BaseStatus.AnchorPoint = Vector2.new(0.5, 0.5)
-BaseStatus.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-BaseStatus.BackgroundTransparency = 1.000
-BaseStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
-BaseStatus.BorderSizePixel = 0
-BaseStatus.Position = UDim2.new(0.0180158652, 0, 0.102523036, 0)
-BaseStatus.Size = UDim2.new(0.0430000015, 0, 0.0680000037, 0)
-BaseStatus.Image = "http://www.roblox.com/asset/?id=11772672161"
-BaseStatus.ScaleType = Enum.ScaleType.Fit
 
-TextLabel_2.Parent = BaseStatus
-TextLabel_2.AnchorPoint = Vector2.new(0.5, 0.5)
-TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel_2.BackgroundTransparency = 1.000
-TextLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel_2.BorderSizePixel = 0
-TextLabel_2.Position = UDim2.new(2.59001899, 0, 0.519450843, 0)
-TextLabel_2.Size = UDim2.new(3.25219774, 0, 0.691913188, 0)
-TextLabel_2.Font = Enum.Font.Unknown
-TextLabel_2.Text = "Base Status"
-TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel_2.TextScaled = true
-TextLabel_2.TextSize = 14.000
-TextLabel_2.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel_2.TextWrapped = true
-TextLabel_2.TextXAlignment = Enum.TextXAlignment.Left
 
-UITextSizeConstraint_6.Parent = TextLabel_2
-UITextSizeConstraint_6.MaxTextSize = 18
+local WHack = Tabs.Visuals:AddSection("WallHack")
 
-Main_2.Name = "Main"
-Main_2.Parent = ChildFrame
-Main_2.AnchorPoint = Vector2.new(0.5, 0.5)
-Main_2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Main_2.BackgroundTransparency = 1.000
-Main_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Main_2.BorderSizePixel = 0
-Main_2.ClipsDescendants = true
-Main_2.Position = UDim2.new(0.5, 0, 0.504999995, 0)
-Main_2.Size = UDim2.new(0.999999881, 0, 0.999999821, 0)
 
-Slider_2.Name = "Slider"
-Slider_2.Parent = Main_2
+local WallHack = Tabs.Visuals:CreateToggle("WallHackToggle", {
+	Title = "WallHack",
+	Default = false 
+})
 
-Buttons_2.Name = "Buttons"
-Buttons_2.Parent = Main_2
+WallHack:OnChanged(function()
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
 
-UICorner_4.CornerRadius = UDim.new(0, 5)
-UICorner_4.Parent = Gui
+	-- Функция добавления Highlight к игроку
+	local function addHighlightToPlayer(targetPlayer)
+		if targetPlayer.Character then
+			local oldHighlight = targetPlayer.Character:FindFirstChildOfClass("Highlight")
+			if oldHighlight then
+				oldHighlight:Destroy()
+			end
 
-UIAspectRatioConstraint.Parent = Gui
-UIAspectRatioConstraint.AspectRatio = 2.000
+			local highlight = Instance.new("Highlight")
+			highlight.FillColor = Color3.fromRGB(255, 0, 0)
+			highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+			highlight.FillTransparency = 0.5
+			highlight.OutlineTransparency = 0
+			highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			highlight.Parent = targetPlayer.Character
+		end
+	end
 
-Watermark.Name = "Watermark"
-Watermark.Parent = ScreenGui
-Watermark.AnchorPoint = Vector2.new(0.5, 0.5)
-Watermark.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Watermark.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Watermark.BorderSizePixel = 0
-Watermark.ClipsDescendants = true
-Watermark.Position = UDim2.new(0.0871613696, 0, 0.97023809, 0)
-Watermark.Size = UDim2.new(0.166868836, 0, 0.0360696502, 0)
+	-- Функция удаления Highlight у игрока
+	local function removeHighlightFromPlayer(targetPlayer)
+		if targetPlayer.Character then
+			local highlight = targetPlayer.Character:FindFirstChildOfClass("Highlight")
+			if highlight then
+				highlight:Destroy()
+			end
+		end
+	end
 
-Line.Name = "Line"
-Line.Parent = Watermark
-Line.AnchorPoint = Vector2.new(0.5, 0.5)
-Line.BackgroundColor3 = Color3.fromRGB(255, 0, 76)
-Line.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Line.BorderSizePixel = 0
-Line.Position = UDim2.new(0.5, 0, -0.00499999989, 0)
-Line.Size = UDim2.new(1.00100005, 0, 0.119999997, 0)
-Line.ZIndex = 2
+	-- Функция удаления всех хайлайтов
+	local function removeAllHighlights()
+		for _, targetPlayer in pairs(Players:GetPlayers()) do
+			if targetPlayer ~= player then
+				removeHighlightFromPlayer(targetPlayer)
+			end
+		end
+	end
 
-UIAspectRatioConstraint_2.Parent = Watermark
-UIAspectRatioConstraint_2.AspectRatio = 11.690
+	if Options.WallHackToggle.Value == true then
+		-- Включаем хайлайты
+		for _, targetPlayer in pairs(Players:GetPlayers()) do
+			if targetPlayer ~= player then
+				addHighlightToPlayer(targetPlayer)
 
-OpenMenu.Name = "OpenMenu"
-OpenMenu.Parent = Watermark
-OpenMenu.AnchorPoint = Vector2.new(0.5, 0.5)
-OpenMenu.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-OpenMenu.BackgroundTransparency = 1.000
-OpenMenu.BorderColor3 = Color3.fromRGB(0, 0, 0)
-OpenMenu.BorderSizePixel = 0
-OpenMenu.Position = UDim2.new(0.479983121, 0, 0.536330104, 0)
-OpenMenu.Size = UDim2.new(0.960925579, 0, 0.939999342, 0)
-OpenMenu.Font = Enum.Font.Unknown
-OpenMenu.Text = "Nevertrip ││ Best Hub"
-OpenMenu.TextColor3 = Color3.fromRGB(255, 255, 255)
-OpenMenu.TextScaled = true
-OpenMenu.TextSize = 15.000
-OpenMenu.TextWrapped = true
+				targetPlayer.CharacterAdded:Connect(function(character)
+					character:WaitForChild("Humanoid")
+					addHighlightToPlayer(targetPlayer)
+				end)
+			end
+		end
+	else
+		-- Выключаем хайлайты
+		removeAllHighlights()
+	end
+end)
 
-UITextSizeConstraint_7.Parent = OpenMenu
-UITextSizeConstraint_7.MaxTextSize = 22
+local ESP = Tabs.Visuals:AddSection("ESP")
 
--- Scripts:
--- Добавьте эти строки после создания Esp и BaseStatus
-local BoolValue = Instance.new("BoolValue")
-BoolValue.Name = "Checked"
-BoolValue.Value = false
-BoolValue.Parent = Esp
+local ESPPlayers = Tabs.Visuals:CreateToggle("ESPPlayersToggle", {Title = "Players Box", Default = false })
 
-local BoolValue2 = Instance.new("BoolValue")
-BoolValue2.Name = "Checked"
-BoolValue2.Value = false
-BoolValue2.Parent = BaseStatus
-
-local function DVSAHXG_fake_script() -- Esp.LocalScript 
-	local script = Instance.new('LocalScript', Esp)
-
-	local defaultHighlightColor = Color3.fromRGB(155, 255, 130)
+ESPPlayers:OnChanged(function()
 	local Players = game:GetService("Players")
 	local RunService = game:GetService("RunService")
-	local LocalPlayer = Players.LocalPlayer
-	local highlights = {}
-	
-	local function createHighlight(character)
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "ESP_Highlight"
-		highlight.FillColor = Color3.fromRGB(155, 255, 130)
-		highlight.FillTransparency = 0.8
-		highlight.OutlineTransparency = 0
-		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		highlight.Enabled = script.Parent.Checked.Value
-		highlight.Parent = character
-		return highlight
-	end
-	
-	
-	-- Функция настройки ESP для игрока
-	local function setupPlayerESP(player)
-		if player == LocalPlayer then return end
-	
-		local function characterAdded(character)
-			wait(0.5)
-	
-			if not highlights[player] and character:FindFirstChild("Humanoid") then
-				highlights[player] = createHighlight(character)
-			end
-		end
-	
-		if player.Character then
-			characterAdded(player.Character)
-		end
-	
-		player.CharacterAdded:Connect(characterAdded)
-		player.CharacterRemoving:Connect(function()
-			if highlights[player] then
-				highlights[player]:Destroy()
-				highlights[player] = nil
-			end
-		end)
-	end
-	
-	-- Инициализация
-	for _, player in ipairs(Players:GetPlayers()) do
-		setupPlayerESP(player)
-	end
-	
-	Players.PlayerAdded:Connect(setupPlayerESP)
-	Players.PlayerRemoving:Connect(function(player)
-		if highlights[player] then
-			highlights[player]:Destroy()
-			highlights[player] = nil
-		end
-	end)
-	
-	script.Parent.Checked.Changed:Connect(function()
-		for player, highlight in pairs(highlights) do
-			if highlight then
-				highlight.Enabled = script.Parent.Checked.Value
-			end
-		end
-	end)
-end
-coroutine.wrap(DVSAHXG_fake_script)()
-local function YPNE_fake_script() -- ScreenGui.Script 
-	local script = Instance.new('LocalScript', ScreenGui)
+	local pld = Players.LocalPlayer 
 
-	local frame = script.Parent.Gui
-	local Button = script.Parent.Watermark.OpenMenu
-	local userInputService = game:GetService("UserInputService")
-	local dragging = false
-	local dragStart = nil
-	local startPos = nil
-	local plr = game.Players.LocalPlayer
-	local players = game.Players
-	local Tabs = frame.TabsFrame.Tabs
-	local Childs = frame.ChildFrame
-	local RS = game:GetService("RunService")
-	local TweenService = game:GetService("TweenService")
-	local frames = 0
-	
-	frame.Position = UDim2.new(0.5, 0, -0.5, 0) -- Сдвигаем за верхний край экрана
-	frame.Visible = true -- Сначала скрываем
-	
-	
-	local function closeMenu()
-		-- Аналогично открытию, но анимируем в конечную точку за экраном
-		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
-		local goals = {}
-		goals.Position = UDim2.new(0.5, 0, -0.5, 0) -- Цель: за верхним краем
-	
-		local closeTween = TweenService:Create(frame, tweenInfo, goals)
-		closeTween:Play()
-	
-	end
-	
-	local function openMenu()
-		local tweenInfo = TweenInfo.new(
-			0.5, -- Длительность анимации в секундах
-			Enum.EasingStyle.Exponential, -- Стиль плавности (Quad, Elastic, Bounce и т.д.)
-			Enum.EasingDirection.Out -- Направление (Out - анимация "затухает" в конце)
-		)
-	
-		-- Создаем цели анимации: куда и как должен прийти наш Frame
-		local goals = {}
-		goals.Position = UDim2.new(0.5, 0, 0.5, 0) -- Цель: центр экрана
-	
-		-- Создаем сам Tween
-		local openTween = TweenService:Create(frame, tweenInfo, goals)
-	
-		-- Запускаем анимацию
-		openTween:Play()
-	end
-	 
-	RS.RenderStepped:Connect(function()
-		frames = frames + 1
-	end)
-	
-	local CheckTrue = 11772695039
-	local CheckFalse = 11772672161
-	
-	local menu = true
-	
-	spawn(function()
-		while wait(1) do
-			Button.Text = "Nevertrip ┃ ".. plr.Name.." ┃ Steal a Brainrot ┃ FPS: " ..frames
-			frames = 0
-		end
-	end)
-	
-	Button.MouseButton1Click:Connect(function()
-		menu = not menu
-	
-		if menu == true then
-			openMenu()
-		else
-			closeMenu()
-		end
-		
-	end)
-	
-	local function update(input)
-		local delta = input.Position - dragStart
-		frame.Position = UDim2.new(
-			startPos.X.Scale, 
-			startPos.X.Offset + delta.X, 
-			startPos.Y.Scale, 
-			startPos.Y.Offset + delta.Y
-		)
-	end
-	
-	frame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			dragStart = input.Position
-			startPos = frame.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	end)
-	
-	frame.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			if dragging then
-				update(input)
+	-- Таблица для хранения ESP объектов
+	local espObjects = {}
+
+	local function createESP(player)
+		-- Не создаем ESP для самого себя
+		if player == pld then return end
+		if not player.Character then return end
+
+		-- Проверяем, не создан ли уже ESP для этого игрока
+		if espObjects[player] then return end
+
+		local character = player.Character
+		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+		if not humanoidRootPart then return end
+
+		local billboardGui = Instance.new("BillboardGui")
+		billboardGui.Name = "PlayerESP"
+		billboardGui.Adornee = humanoidRootPart
+		billboardGui.AlwaysOnTop = true
+		billboardGui.LightInfluence = 1.000
+		billboardGui.Size = UDim2.new(4, 0, 7, 0)
+		billboardGui.Parent = humanoidRootPart
+
+		local Frame = Instance.new("Frame")
+		Frame.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+		Frame.BackgroundTransparency = 0.700
+		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Frame.BorderSizePixel = 0
+		Frame.Size = UDim2.new(1, 0, 1, 0)
+		Frame.Parent = billboardGui
+
+		local Corner = Instance.new("UIStroke")
+		Corner.Color = Color3.new(0, 255,255)
+		Corner.Thickness = 1.5
+		Corner.Parent = Frame
+
+		-- Сохраняем ссылку на ESP объект
+		espObjects[player] = billboardGui
+
+		-- Обработчик удаления персонажа
+		local function characterRemoved()
+			if espObjects[player] then
+				espObjects[player]:Destroy()
+				espObjects[player] = nil
 			end
 		end
-	end)
-	
-	Tabs.Main.MouseButton1Click:Connect(function()
-		Childs.Main.Visible = true
-		Childs.Visuals.Visible = false
-	end)
-	
-	Tabs.Visuals.MouseButton1Click:Connect(function()
-		Childs.Main.Visible = false
-		Childs.Visuals.Visible = true
-	end)
-	
-	for _, vbutton in Childs.Visuals.Buttons:GetChildren() do
-		vbutton.MouseButton1Click:Connect(function()
-			vbutton.Checked.Value = not vbutton.Checked.Value
-	
-			if vbutton.Checked.Value == true then
-				vbutton.Image = "http://www.roblox.com/asset/?id=" ..CheckTrue
-			else
-				vbutton.Image = "http://www.roblox.com/asset/?id=" ..CheckFalse
+
+		character.AncestryChanged:Connect(function(_, parent)
+			if not parent then
+				characterRemoved()
+			end
+		end)
+
+		character:GetPropertyChangedSignal("Parent"):Connect(function()
+			if not character.Parent then
+				characterRemoved()
 			end
 		end)
 	end
-	
-	
-	
+
+	local function deleteESP(player)
+		if espObjects[player] then
+			espObjects[player]:Destroy()
+			espObjects[player] = nil
+		end
+	end
+
+	local function deleteAllESP()
+		for player, espObject in pairs(espObjects) do
+			espObject:Destroy()
+		end
+		espObjects = {}
+	end
+
+	local function onPlayerAdded(player)
+		player.CharacterAdded:Connect(function(character)
+			if Options and Options.ESPPlayersToggle and Options.ESPPlayersToggle.Value == true then
+				createESP(player)
+			end
+		end)
+
+		if player.Character and Options and Options.ESPPlayersToggle and Options.ESPPlayersToggle.Value == true then
+			createESP(player)
+		end
+	end
+
+	local function onPlayerRemoving(player)
+		deleteESP(player)
+	end
+
+	-- Инициализация для существующих игроков
+	for _, player in ipairs(Players:GetPlayers()) do
+		onPlayerAdded(player)
+	end
+
+	-- Обработка новых игроков
+	Players.PlayerAdded:Connect(onPlayerAdded)
+	Players.PlayerRemoving:Connect(onPlayerRemoving)
+
+	-- Основной цикл обновления
+	RunService.Heartbeat:Connect(function()
+		if Options and Options.ESPPlayersToggle then
+			if Options.ESPPlayersToggle.Value == true then
+				-- Создаем ESP для всех игроков кроме себя
+				for _, player in ipairs(Players:GetPlayers()) do
+					if player ~= pld then
+						createESP(player)
+					end
+				end
+			else
+				-- Удаляем все ESP
+				deleteAllESP()
+			end
+		end
+	end)
+end)
+
+
+local Combat = Tabs.Player:AddSection("Combat")
+
+local HitTarget = Tabs.Player:CreateToggle("HitTargetToggle", {Title = "Hit Target", Default = false })
+
+HitTarget:OnChanged(function()
+	isEnabled = Options.HitTargetToggle.Value
+end)
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+-- Создаем таблицу с именами игроков для Dropdown
+local playerNames = {"Auto"}
+for _, otherPlayer in ipairs(Players:GetPlayers()) do
+	if otherPlayer ~= player then
+		table.insert(playerNames, otherPlayer.Name)
+	end
 end
-coroutine.wrap(YPNE_fake_script)()
+
+
+
+-- Переменные для бота
+local targetPlayer = nil
+local attackRange = 8
+local lastAttackTime = 0
+local attackCooldown = 0.5
+local selectedPlayer = "Auto"
+
+-- Создаем Dropdown (предполагая, что у тебя уже есть Tabs)
+local Dropdown = Tabs.Player:CreateDropdown("PlayerSelector", {
+	Title = "Select Target",
+	Values = playerNames,
+	Multi = false,
+	Default = 1,
+})
+-- Функция для установки цели
+local function setTarget()
+	if selectedPlayer == "Auto" then
+		-- Автоматический выбор ближайшего игрока
+		local closestPlayer = nil
+		local closestDistance = math.huge
+
+		for _, otherPlayer in pairs(Players:GetPlayers()) do
+			if otherPlayer ~= player and otherPlayer.Character then
+				local otherRoot = otherPlayer.Character:FindFirstChild("HumanoidRootPart")
+				local myRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+				if otherRoot and myRoot then
+					local distance = (myRoot.Position - otherRoot.Position).Magnitude
+					if distance < closestDistance then
+						closestDistance = distance
+						closestPlayer = otherPlayer
+					end
+				end
+			end
+		end
+
+		targetPlayer = closestPlayer
+	else
+		-- Поиск игрока по имени из Dropdown
+		for _, otherPlayer in pairs(Players:GetPlayers()) do
+			if otherPlayer.Name == selectedPlayer and otherPlayer ~= player then
+				targetPlayer = otherPlayer
+				return
+			end
+		end
+		targetPlayer = nil
+	end
+end
+
+-- Включение/выключение по клавише F
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if isEnabled then
+		setTarget() -- Устанавливаем цель при включении
+	end
+end)
+
+-- Функция для симуляции клика мыши
+local function simulateMouseClick()
+	local virtualInput = game:GetService("VirtualInputManager")
+	virtualInput:SendMouseButtonEvent(0, 0, 0, true, game, 1)
+	task.wait(0.1)
+	virtualInput:SendMouseButtonEvent(0, 0, 0, false, game, 1)
+end
+
+-- Проверка на препятствия
+local function hasClearPath(startPos, endPos)
+	local raycastParams = RaycastParams.new()
+	raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+	raycastParams.FilterDescendantsInstances = {player.Character}
+
+	local direction = (endPos - startPos).Unit
+	local distance = (startPos - endPos).Magnitude
+	local raycastResult = workspace:Raycast(startPos, direction * distance, raycastParams)
+
+	return raycastResult == nil
+end
+
+-- Поиск обходного пути
+local function findAlternativePath(currentPos, targetPos)
+	local directions = {
+		Vector3.new(1, 0, 0), Vector3.new(-1, 0, 0),
+		Vector3.new(0, 0, 1), Vector3.new(0, 0, -1),
+		Vector3.new(1, 0, 1), Vector3.new(-1, 0, 1),
+		Vector3.new(1, 0, -1), Vector3.new(-1, 0, -1)
+	}
+
+	for _, dir in pairs(directions) do
+		local testPos = currentPos + dir * 5
+		if hasClearPath(currentPos, testPos) and hasClearPath(testPos, targetPos) then
+			return testPos
+		end
+	end
+
+	return nil
+end
+
+-- Основной цикл преследования и атаки
+RunService.Heartbeat:Connect(function()
+	if not isEnabled or not targetPlayer then return end
+
+	local character = player.Character
+	local targetCharacter = targetPlayer.Character
+
+	if not character or not targetCharacter then return end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+	local targetRoot = targetCharacter:FindFirstChild("HumanoidRootPart")
+	local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+
+	if not humanoid or not humanoidRootPart or not targetRoot or not targetHumanoid then return end
+	if targetHumanoid.Health <= 0 then return end
+
+	-- Расчет расстояния до цели
+	local distance = (humanoidRootPart.Position - targetRoot.Position).Magnitude
+
+	if distance > attackRange then
+		if hasClearPath(humanoidRootPart.Position, targetRoot.Position) then
+			humanoid:MoveTo(targetRoot.Position)
+		else
+			local alternativePath = findAlternativePath(humanoidRootPart.Position, targetRoot.Position)
+			if alternativePath then
+				humanoid:MoveTo(alternativePath)
+			else
+				humanoid:MoveTo(targetRoot.Position)
+			end
+		end
+	else
+		humanoid:MoveTo(humanoidRootPart.Position)
+
+		local currentTime = tick()
+		if currentTime - lastAttackTime >= attackCooldown then
+			simulateMouseClick()
+			lastAttackTime = currentTime
+		end
+
+		local lookAt = CFrame.lookAt(humanoidRootPart.Position, targetRoot.Position)
+		humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position) * CFrame.Angles(0, lookAt:ToEulerAnglesXYZ(), 0)
+	end
+end)
+
+-- Обновление списка игроков в Dropdown при подключении/отключении
+local function updatePlayerList()
+	local newPlayerNames = {"Auto"}
+	for _, otherPlayer in ipairs(Players:GetPlayers()) do
+		if otherPlayer ~= player then
+			table.insert(newPlayerNames, otherPlayer.Name)
+		end
+	end
+	Dropdown:SetValues(newPlayerNames)
+end
+
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+-- Обработчик выбора в Dropdown
+Dropdown:OnChanged(function(selection)
+	selectedPlayer = selection
+	print("Выбран игрок: " .. selection)
+
+	if isEnabled then
+		setTarget() -- Переустанавливаем цель если бот включен
+	end
+end)
+
+local Helper = Tabs.Player:AddSection("Helper")
+
+local CancelPacket = Tabs.Player:CreateToggle("CancelPacketToggle", {
+	Title = "Cancel Packet",
+	Default = false
+})
+
+CancelPacket:OnChanged(function()
+	task.spawn(function()
+		local RunService = game:GetService("RunService")
+		RunService.Heartbeat:Connect(function()
+			local plr = game:GetService("Players").LocalPlayer
+			local chr = plr.Character or plr.CharacterAdded:Wait()
+			local hum = chr:FindFirstChild("Humanoid")
+			local hpr = chr:FindFirstChild("HumanoidRootPart")
+			if Options.CancelPacketToggle.Value == true then
+				hpr.Anchored = not hpr.Anchored
+			end
+		end)
+	end)
+end)
+
+local CancelRagdoll = Tabs.Player:CreateToggle("CancelRagdollToggle", {
+	Title = "Cancel Ragdoll",
+	Default = false
+})
+
+CancelRagdoll:OnChanged(function()
+	task.spawn(function()
+		local RunService = game:GetService("RunService")
+		RunService.Heartbeat:Connect(function()
+			local plr = game:GetService("Players").LocalPlayer
+			local chr = plr.Character or plr.CharacterAdded:Wait()
+			local hum = chr:FindFirstChild("Humanoid")
+			local hpr = chr:FindFirstChild("HumanoidRootPart")
+			if Options.CancelRagdollToggle.Value == true then
+				if hum:GetState() == Enum.HumanoidStateType.Physics then
+					hpr.Anchored = not hpr.Anchored
+				end
+			end
+		end)
+	end)
+end)
+
+local InfiniteJump = Tabs.Player:CreateToggle("InfiniteJumpToggle", {Title = "Infinite Jump", Default = false })
+
+InfiniteJump:OnChanged(function()
+	task.spawn(function()
+		local Players = game:GetService("Players")
+		local RunService = game:GetService("RunService")
+
+		local player = Players.LocalPlayer
+		local platform = nil
+		local connection = nil
+
+		-- Функция создания/удаления платформы
+		local function updatePlatform()
+			if platform then
+				platform:Destroy()
+				platform = nil
+			end
+
+			if Options.InfiniteJumpToggle.Value == true then
+				platform = Instance.new("Part")
+				platform.Name = "PlayerPlatform"
+				platform.Size = Vector3.new(8, 1, 8)
+				platform.Anchored = true
+				platform.CanCollide = true
+				platform.Transparency = 1
+				platform.Parent = workspace
+			end
+		end
+
+		-- Функция обновления позиции платформы
+		local function updatePlatformPosition()
+			if connection then
+				connection:Disconnect()
+				connection = nil
+			end
+
+			if Options.InfiniteJumpToggle.Value == true then
+				connection = RunService.Heartbeat:Connect(function()
+					if platform and player.Character then
+						local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+						if rootPart then
+							local playerPos = rootPart.Position
+							platform.Position = Vector3.new(playerPos.X, playerPos.Y - 4, playerPos.Z)
+						end
+					end
+				end)
+			end
+		end
+
+		-- Обработчик изменения значения тоггла
+		Options.InfiniteJumpToggle:OnChanged(function(value)
+			updatePlatform()
+			updatePlatformPosition()
+		end)
+
+		-- Обработка смены персонажа
+		player.CharacterAdded:Connect(function()
+			updatePlatform()
+			updatePlatformPosition()
+		end)
+
+		-- Инициализация
+		updatePlatform()
+		updatePlatformPosition()
+	end)
+end)
+
+local AutoSpeed = Tabs.Player:CreateToggle("AutoSpeedToggle", {
+	Title = "Auto Speed",
+	Default = false })
+
+AutoSpeed:OnChanged(function()
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
+
+	local function equipBestCoil()
+		local character = player.Character
+		if not character then return end
+
+		-- Проверяем есть ли уже инструмент в руках
+		local hasTool = false
+		for _, item in ipairs(character:GetChildren()) do
+			if item:IsA("Tool") then
+				hasTool = true
+				break
+			end
+		end
+
+		-- Если инструмента нет - ищем лучший доступный coil
+		if not hasTool then
+			local backpack = player:FindFirstChild("Backpack")
+			if backpack then
+				local coilCombo = nil
+				local speedCoil = nil
+
+				-- Ищем все доступные coils
+				for _, item in ipairs(backpack:GetChildren()) do
+					if item:IsA("Tool") then
+						if item.Name:lower():find("combo") then
+							coilCombo = item -- Приоритет: Coil Combo
+						elseif item.Name:lower():find("speed") and not speedCoil then
+							speedCoil = item -- Запасной: Speed Coil
+						end
+					end
+				end
+
+				-- Экипируем лучший доступный вариант
+				if coilCombo then
+					coilCombo.Parent = character
+				elseif speedCoil then
+					speedCoil.Parent = character
+				end
+			end
+		end
+	end
+
+
+	task.spawn(function()
+		while true do
+			if Options.AutoSpeedToggle.Value == true then
+				equipBestCoil()
+			end
+			wait(0.1)
+		end
+	end)
+end)
+
+local Other = Tabs.Player:AddSection("Other")
+
+local SpinBot = Tabs.Player:CreateToggle("SpinBotToggle", {Title = "Spin Bot", Default = false })
+
+SpinBot:OnChanged(function()
+	local Players = game:GetService("Players")
+	local UserInputService = game:GetService("UserInputService")
+
+	local player = Players.LocalPlayer
+	local mouse = player:GetMouse()
+
+	local spinSpeed = 8
+
+	game:GetService("RunService").RenderStepped:Connect(function()
+		if Options.SpinBotToggle.Value == true then
+			local character = player.Character
+			if character then
+				local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+				if humanoidRootPart then
+					humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.Angles(0, math.rad(spinSpeed), 0)
+				end
+			end
+		end
+	end)
+end)
+
+
+local FakeLag = Tabs.Player:CreateToggle("FakeLagToggle", {Title = "Fake Lag", Default = false })
+
+FakeLag:OnChanged(function()
+	local plr = game:GetService("Players").LocalPlayer
+	local chr = plr.Character or plr.CharacterAdded:Wait()
+	local Hrp = chr:WaitForChild("HumanoidRootPart")
+
+	task.spawn(function()
+		while true do
+			if Options.FakeLagToggle.Value == true then
+				Hrp.Anchored = not Hrp.Anchored
+				task.wait(0.1)
+			else
+				Hrp.Anchored = false
+				break
+			end
+		end
+	end)
+end)
+
+-- Addons:
+-- SaveManager (Allows you to have a configuration system)
+-- InterfaceManager (Allows you to have a interface managment system)
+
+-- Hand the library over to our managers
+SaveManager:SetLibrary(Library)
+InterfaceManager:SetLibrary(Library)
+
+-- Ignore keys that are used by ThemeManager.
+-- (we dont want configs to save themes, do we?)
+SaveManager:IgnoreThemeSettings()
+
+-- You can add indexes of elements the save manager should ignore
+SaveManager:SetIgnoreIndexes{}
+
+-- use case for doing it this way:
+-- a script hub could have themes in a global folder
+-- and game configs in a separate folder per game
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+
+Window:SelectTab(1)
+
+Library:Notify{
+	Title = "Celestum X",
+	Content = "The script has been loaded.",
+	Duration = 8
+}
+
+-- You can use the SaveManager:LoadAutoloadConfig() to load a config
+-- which has been marked to be one that auto loads!
+SaveManager:LoadAutoloadConfig()
