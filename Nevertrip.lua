@@ -19,7 +19,7 @@ local Window = Library:CreateWindow{
 	SubTitle = "RECODE",
 	TabWidth = 160,
 	Size = UDim2.fromScale(0.45, 0.7),
-	Resize = true, -- Resize this ^ Size according to a 1920x1080 screen, good for mobile users but may look weird on some devices
+	Resize = false, -- Resize this ^ Size according to a 1920x1080 screen, good for mobile users but may look weird on some devices
 	MinSize = Vector2.new(470, 380),
 	Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
 	Theme = "Tomorrow Night Blue",
@@ -374,6 +374,304 @@ ESPPlayers:OnChanged(function()
 			end
 		end
 	end)
+end)
+
+local Base = Tabs.Visuals:AddSection("ESP Base")
+
+local MyBase = Tabs.Visuals:CreateToggle("MyBaseToggle", {Title = "Gui State", Default = false })
+
+MyBase:OnChanged(function()
+	if Options.MyBaseToggle.Value == true then
+		local plots = game.Workspace.Plots
+		local RunService = game:GetService("RunService")
+		local Players = game:GetService("Players")
+
+		local localPlayer = Players.LocalPlayer
+		local screenGui = nil
+
+		-- Функция создания интерфейса
+		local function createGui()
+			if screenGui and screenGui.Parent then
+				screenGui:Destroy()
+			end
+
+			screenGui = Instance.new("ScreenGui")
+			local Frame = Instance.new("Frame")
+			local UICorner = Instance.new("UICorner")
+			local Lock = Instance.new("TextLabel")
+			local Time = Instance.new("TextLabel")
+			local stroke = Instance.new("UIStroke")
+
+			--Properties:
+			screenGui.Name = "BaseStatusGui"
+			screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
+			screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			screenGui.ResetOnSpawn = false -- Важно: не удалять при респавне
+
+			Frame.Parent = screenGui
+			Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			Frame.BackgroundTransparency = 0.500
+			Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Frame.BorderSizePixel = 0
+			Frame.Position = UDim2.new(0.449746937, 0, 0.0331674963, 0)
+			Frame.Size = UDim2.new(0.115690529, 0, 0.05, 0)
+
+			UICorner.CornerRadius = UDim.new(0.150000006, 0)
+			UICorner.Parent = Frame
+
+			Lock.Name = "Lock"
+			Lock.Parent = Frame
+			Lock.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Lock.BackgroundTransparency = 1.000
+			Lock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Lock.BorderSizePixel = 0
+			Lock.Position = UDim2.new(0, 0, 0.0188679248, 0)
+			Lock.Size = UDim2.new(1, 0, 0.566037714, 0)
+			Lock.Font = Enum.Font.Nunito
+			Lock.TextColor3 = Color3.fromRGB(255, 255, 255)
+			Lock.TextScaled = true
+			Lock.TextSize = 29.000
+			Lock.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+			Lock.TextWrapped = true
+
+			stroke.Parent = Frame
+			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			stroke.Thickness = 1.5
+			stroke.Color = Color3.fromRGB(170, 181, 255)
+
+			Time.Name = "Timer"
+			Time.Parent = Frame
+			Time.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Time.BackgroundTransparency = 1.000
+			Time.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Time.BorderSizePixel = 0
+			Time.Position = UDim2.new(0, 0, 0.584905684, 0)
+			Time.Size = UDim2.new(1, 0, 0.415094346, 0)
+			Time.Font = Enum.Font.Nunito
+			Time.TextColor3 = Color3.fromRGB(255, 255, 255)
+			Time.TextScaled = true
+			Time.TextSize = 29.000
+			Time.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+			Time.TextWrapped = true
+
+			return screenGui, Lock, Time
+		end
+
+		-- Создаем интерфейс при запуске
+		local gui, lockLabel, timeLabel = createGui()
+		local sizelocked = UDim2.new(1, 0, 0.566037714, 0)
+
+		local function GuiLocked()
+			for _, Plot in plots:GetChildren() do
+				local owner = Plot.PlotSign.YourBase
+				if owner.Enabled == true then
+					local Purchases = Plot.Purchases.PlotBlock.Main.BillboardGui
+					local Timer = Purchases.RemainingTime
+					local Locked = Purchases.Locked
+					if Locked.Visible == true then
+						timeLabel.Visible = true
+						lockLabel.Size = sizelocked
+						lockLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+						lockLabel.Text = Locked.Text
+						timeLabel.Text = Timer.Text
+					else
+						lockLabel.TextColor3 = Color3.fromRGB(255, 247, 0)
+						lockLabel.Size = UDim2.new(1, 0, 0.9, 0)
+						lockLabel.Text = "Unlocked"
+						timeLabel.Visible = false
+					end
+				end
+			end
+		end
+
+		-- Обработчик смерти игрока
+		local function onCharacterAdded(character)
+			-- Проверяем, что переключатель все еще включен
+			if Options.MyBaseToggle.Value == true then
+				-- Пересоздаем интерфейс
+				gui, lockLabel, timeLabel = createGui()
+				print("Интерфейс восстановлен после смерти")
+			end
+		end
+
+		-- Подписываемся на событие появления персонажа
+		localPlayer.CharacterAdded:Connect(onCharacterAdded)
+
+		-- Запускаем основной цикл
+		local heartbeatConnection = RunService.Heartbeat:Connect(function()
+			if gui and gui.Parent then
+				GuiLocked()
+			end
+		end)
+
+		-- Функция для очистки при выключении
+		return function()
+			if heartbeatConnection then
+				heartbeatConnection:Disconnect()
+			end
+			if gui and gui.Parent then
+				gui:Destroy()
+			end
+		end
+
+	else
+		if game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("BaseStatusGui") then
+			game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("BaseStatusGui"):Destroy()
+		end
+	end
+	
+end)
+
+local BrainRotsESP = Tabs.Visuals:CreateToggle("MyBaseStateToggle", {Title = "ESP Brain Rot", Default = false })
+
+local BrainESP = Tabs.Visuals:CreateDropdown("BrainRotsESPT", {
+	Title = "Rarity BrainRot",
+	Description = "Select need rarity",
+	Values = {
+		"Common",
+		"Rare", 
+		"Epic",
+		"Legendary",
+		"Mythic",
+		"Brainrot God",
+		"Secret"
+	},
+	Multi = true,
+	Default = {"Common"},
+})
+
+local SelectedRarity = {"Common"}
+local highlights = {} -- Таблица для хранения созданных хайлайтов
+
+BrainESP:OnChanged(function(Value)
+	SelectedRarity = {}
+	for rarity, isSelected in pairs(Value) do
+		if isSelected then
+			table.insert(SelectedRarity, rarity)
+		end
+	end
+end)
+
+BrainRotsESP:OnChanged(function(State)
+	local Plots = workspace:FindFirstChild("Plots")
+	if not Plots then 
+		warn("Plots not found in workspace!")
+		return 
+	end
+
+	local function shouldShowESP(rarityText)
+		for _, selectedRarity in ipairs(SelectedRarity) do
+			if rarityText == selectedRarity then
+				return true
+			end
+		end
+		return false
+	end
+
+	local function updateESP()
+		for _, Plot in pairs(Plots:GetChildren()) do
+			local Animals = Plot:FindFirstChild("AnimalPodiums")
+			if Animals then
+				for _, Animal in pairs(Animals:GetChildren()) do
+					local Base = Animal:FindFirstChild("Base")
+					if Base then
+						local Decorations = Base:FindFirstChild("Decorations")
+						local Spawnd = Base:FindFirstChild("Spawn")
+						if Spawnd and Decorations then
+							local Attachment = Spawnd:FindFirstChild("Attachment")
+							if Attachment then
+								local OverHead = Attachment:FindFirstChild("AnimalOverhead")
+								if OverHead and OverHead:FindFirstChild("Rarity") then
+									local rarityText = OverHead.Rarity.Text
+									local animalId = tostring(Animal:GetDebugId()) -- Уникальный ID для хранения хайлайта
+
+									if State and shouldShowESP(rarityText) then
+										-- Включаем ESP для выбранных редкостей
+										if not highlights[animalId] then
+											local highlight = Instance.new("Highlight")
+											highlight.FillColor = Color3.fromRGB(170, 181, 255)
+											highlight.FillTransparency = 0.5
+											highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+											highlight.OutlineTransparency = 0
+											highlight.Parent = Decorations
+											highlights[animalId] = highlight
+										end
+
+										-- Включаем видимость имени и редкости
+										OverHead.ClipsDescendants = false
+										OverHead.AlwaysOnTop = true
+										OverHead.MaxDistance = 9999
+										OverHead.Size = UDim2.new(50, 80, 8, 80)
+									else
+										-- Выключаем ESP для остальных
+										if highlights[animalId] then
+											highlights[animalId]:Destroy()
+											highlights[animalId] = nil
+										end
+
+										OverHead.ClipsDescendants = true
+										OverHead.AlwaysOnTop = false
+										OverHead.MaxDistance = 60
+										OverHead.Size = UDim2.new(50, 80, 8, 80)
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if State then
+		-- Включаем ESP
+		if BrainRotsESP.connection then
+			BrainRotsESP.connection:Disconnect()
+		end
+		BrainRotsESP.connection = game:GetService("RunService").Heartbeat:Connect(updateESP)
+		updateESP() -- Первоначальное обновление
+		print("ESP BrainRot: ON")
+	else
+		-- Выключаем ESP
+		if BrainRotsESP.connection then
+			BrainRotsESP.connection:Disconnect()
+			BrainRotsESP.connection = nil
+		end
+
+		-- Удаляем все хайлайты
+		for animalId, highlight in pairs(highlights) do
+			if highlight then
+				highlight:Destroy()
+			end
+		end
+		highlights = {} -- Очищаем таблицу
+
+		-- Сбрасываем все к значениям по умолчанию
+		for _, Plot in pairs(Plots:GetChildren()) do
+			local Animals = Plot:FindFirstChild("AnimalPodiums")
+			if Animals then
+				for _, Animal in pairs(Animals:GetChildren()) do
+					local Base = Animal:FindFirstChild("Base")
+					if Base then
+						local Spawnd = Base:FindFirstChild("Spawn")
+						if Spawnd then
+							local Attachment = Spawnd:FindFirstChild("Attachment")
+							if Attachment then
+								local OverHead = Attachment:FindFirstChild("AnimalOverhead")
+								if OverHead then
+									OverHead.ClipsDescendants = true
+									OverHead.AlwaysOnTop = false
+									OverHead.MaxDistance = 60
+									OverHead.Size = UDim2.new(0, 50, 0, 50)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+		print("ESP BrainRot: OFF")
+	end
 end)
 
 
