@@ -182,7 +182,7 @@ end)
 
 local AutoClose = Tabs.Main:AddSection("Auto Close Base")
 
-local AutoCloseT = Tabs.Visuals:CreateToggle("AutoCloseToggle", {
+local AutoCloseT = Tabs.Main:CreateToggle("AutoCloseToggle", {
 	Title = "Auto Close Base",
 	Default = false 
 })
@@ -245,13 +245,17 @@ AutoCloseT:OnChanged(function()
 		if Options.AutoCloseToggle.Value == true then
 			for _, Plot in workspace.Plots:GetChildren() do
 				local Owner = Plot:WaitForChild("PlotSign").YourBase
-				if Owner.Enabled == true and Plot.Purchases.PlotBlock.Main.BillboardGui.Locked.Visible == false then
-					autoTaser()
-					local args = {
-						Player.Character:WaitForChild("UpperTorso")
-					}
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Net"):WaitForChild("RE/UseItem"):FireServer(unpack(args))
-					HumRootPart.CFrame = CFrame.new(Plot.Purchases.PlotBlock.Hitbox.Position)
+				if Owner.Enabled == true then
+					for _, lop in Plot.Purchases:GetChildren() do
+						if lop.Main.BillboardGui.Locked.Visible == false then
+							autoTaser()
+							local args = {
+								Player.Character:WaitForChild("UpperTorso")
+							}
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Net"):WaitForChild("RE/UseItem"):FireServer(unpack(args))
+							HumRootPart.CFrame = CFrame.new(Plot.Purchases.PlotBlock.Hitbox.Position)
+						end
+					end
 				end
 			end
 		end
