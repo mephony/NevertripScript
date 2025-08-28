@@ -951,7 +951,7 @@ InfiniteJump:OnChanged(function()
 						local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
 						if rootPart then
 							local playerPos = rootPart.Position
-							platform.Position = Vector3.new(playerPos.X, playerPos.Y - 3.5, playerPos.Z)
+							platform.Position = Vector3.new(playerPos.X, playerPos.Y - 3, playerPos.Z)
 						end
 					end
 				end)
