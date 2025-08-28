@@ -601,7 +601,7 @@ BrainRotsESP:OnChanged(function(State)
 										OverHead.ClipsDescendants = false
 										OverHead.AlwaysOnTop = true
 										OverHead.MaxDistance = 9999
-										OverHead.Size = UDim2.new(50, 80, 8, 80)
+										OverHead.Size = UDim2.new(15, 80, 5, 80)
 									else
 										-- Выключаем ESP для остальных
 										if highlights[animalId] then
@@ -612,7 +612,7 @@ BrainRotsESP:OnChanged(function(State)
 										OverHead.ClipsDescendants = true
 										OverHead.AlwaysOnTop = false
 										OverHead.MaxDistance = 60
-										OverHead.Size = UDim2.new(50, 80, 8, 80)
+										OverHead.Size = UDim2.new(15, 0, 5, 0)
 									end
 								end
 							end
