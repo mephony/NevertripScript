@@ -245,13 +245,13 @@ AutoCloseT:OnChanged(function()
 		if Options.AutoCloseToggle.Value == true then
 			for _, Plot in workspace.Plots:GetChildren() do
 				local Owner = Plot:WaitForChild("PlotSign").YourBase
-				if Owner.Enabled == true and Plot.Purchases.PlotBlock.Main.BillboardGui.Locked.Enabled == false then
+				if Owner.Enabled == true and Plot.Purchases.PlotBlock.Main.BillboardGui.Locked.Visible == false then
 					autoTaser()
 					local args = {
 						Player.Character:WaitForChild("UpperTorso")
 					}
 					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Net"):WaitForChild("RE/UseItem"):FireServer(unpack(args))
-					HumRootPart.CFrame = CFrame.new(Plot.Purchases.PlotBlock.Hitbox.CFrame)
+					HumRootPart.CFrame = CFrame.new(Plot.Purchases.PlotBlock.Hitbox.Position)
 				end
 			end
 		end
