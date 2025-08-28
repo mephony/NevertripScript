@@ -180,7 +180,83 @@ AutoCollect:OnChanged(function(Value)
 	end
 end) 
 
+local AutoClose = Tabs.Main:AddSection("Auto Close Base")
 
+local AutoCloseT = Tabs.Visuals:CreateToggle("AutoCloseToggle", {
+	Title = "Auto Close Base",
+	Default = false 
+})
+
+AutoCloseT:OnChanged(function()
+	local Proximity = game:GetService("ProximityPromptService")
+	local Player = game:GetService("Players").LocalPlayer
+	local Chr = Player.Character
+	local HumRootPart = Chr:WaitForChild("HumanoidRootPart")
+
+	local Players = game:GetService("Players")
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local Workspace = game:GetService("Workspace")
+	local UserInputService = game:GetService("UserInputService")
+
+	local player = Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:WaitForChild("Humanoid")
+
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
+
+	local function findTaser()
+		-- Ищем тазер в инвентаре
+		local backpack = player:FindFirstChild("Backpack")
+		if backpack then
+			for _, tool in ipairs(backpack:GetChildren()) do
+				if tool:IsA("Tool") and (tool.Name:lower():find("taser") or tool.Name:lower():find("stun") or tool.Name:lower():find("gun")) then
+					return tool
+				end
+			end
+		end
+
+		-- Ищем в руках
+		local character = player.Character
+		if character then
+			for _, tool in ipairs(character:GetChildren()) do
+				if tool:IsA("Tool") and (tool.Name:lower():find("taser") or tool.Name:lower():find("stun") or tool.Name:lower():find("gun")) then
+					return tool
+				end
+			end
+		end
+
+		return nil
+	end
+
+	local function autoTaser()
+		local taser = findTaser()
+		if taser then
+			-- Экипируем если не в руках
+			if taser.Parent ~= player.Character then
+				taser.Parent = player.Character
+			end
+		end
+	end
+
+
+
+	while wait(0.1)  do
+		if Options.AutoCloseToggle.Value == true then
+			for _, Plot in workspace.Plots:GetChildren() do
+				local Owner = Plot:WaitForChild("PlotSign").YourBase
+				if Owner.Enabled == true and Plot.Purchases.PlotBlock.Main.BillboardGui.Locked.Enabled == false then
+					autoTaser()
+					local args = {
+						Player.Character:WaitForChild("UpperTorso")
+					}
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Net"):WaitForChild("RE/UseItem"):FireServer(unpack(args))
+					HumRootPart.CFrame = CFrame.new(Plot.Purchases.PlotBlock.Hitbox.CFrame)
+				end
+			end
+		end
+	end
+end)
 
 
 local WHack = Tabs.Visuals:AddSection("WallHack")
@@ -601,7 +677,7 @@ BrainRotsESP:OnChanged(function(State)
 										OverHead.ClipsDescendants = false
 										OverHead.AlwaysOnTop = true
 										OverHead.MaxDistance = 9999
-										OverHead.Size = UDim2.new(15, 80, 5, 80)
+										OverHead.Size = UDim2.new(50, 80, 8, 80)
 									else
 										-- Выключаем ESP для остальных
 										if highlights[animalId] then
@@ -612,7 +688,7 @@ BrainRotsESP:OnChanged(function(State)
 										OverHead.ClipsDescendants = true
 										OverHead.AlwaysOnTop = false
 										OverHead.MaxDistance = 60
-										OverHead.Size = UDim2.new(15, 0, 5, 0)
+										OverHead.Size = UDim2.new(50, 80, 8, 80)
 									end
 								end
 							end
@@ -951,7 +1027,7 @@ InfiniteJump:OnChanged(function()
 						local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
 						if rootPart then
 							local playerPos = rootPart.Position
-							platform.Position = Vector3.new(playerPos.X, playerPos.Y - 3, playerPos.Z)
+							platform.Position = Vector3.new(playerPos.X, playerPos.Y - 4, playerPos.Z)
 						end
 					end
 				end)
